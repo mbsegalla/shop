@@ -1,5 +1,7 @@
+import axios from "axios"
 import { GetStaticProps } from "next"
 import Image from "next/image"
+import { useState } from "react"
 import Stripe from "stripe"
 import { stripe } from "../../lib/stripe"
 import { ImageContainer, ProductContainer, ProductDetails } from "../../styles/pages/product"
@@ -11,10 +13,27 @@ interface ProductProps {
     description: string
     imageUrl: string
     price: string
+    defaultPriceId: string
   }
 }
 
 const Product = ({ product }: ProductProps) => {
+  const [loading, setLoading] = useState(false)
+
+  const handleBuyProduct = async () => {
+    try {
+      setLoading(true)
+      const response = await axios.post('/api/checkout', {
+        priceId: product.defaultPriceId
+      })
+      const { checkoutUrl } = response.data
+      window.location.href = checkoutUrl
+    } catch (error) {
+      console.log(error)
+      setLoading(false)
+    }
+  }
+
   return (
     <ProductContainer>
       <ImageContainer>
@@ -24,7 +43,12 @@ const Product = ({ product }: ProductProps) => {
         <h1>{product.name}</h1>
         <span>{product.price}</span>
         <p>{product.description}</p>
-        <button>Comprar agora</button>
+        <button
+          onClick={() => handleBuyProduct()}
+          disabled={loading}
+        >
+          Comprar agora
+        </button>
       </ProductDetails>
     </ProductContainer>
   )
@@ -52,6 +76,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
           style: 'currency',
           currency: 'BRL'
         }).format(price.unit_amount / 100),
+        defaultPriceId: price.id
       }
     },
     revalidate: 60 * 60 * 24 // 24 hours
