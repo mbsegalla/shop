@@ -18,7 +18,7 @@ const Success = ({ costumerName, product }: SuccessProps) => {
   return (
     <>
       <Head>
-        <title>Compra efetuada | Ignite Shop</title>
+        <title>Compra efetuada | MB Shop</title>
         <meta name="robots" content="noindex" />
       </Head>
       <SuccessContainer>
@@ -26,9 +26,7 @@ const Success = ({ costumerName, product }: SuccessProps) => {
         <ImageContainer>
           <Image src={product.imageUrl} width={120} height={110} alt="" />
         </ImageContainer>
-        <p>
-          Uhuul <strong>{costumerName}</strong>, sua <strong>{product.name}</strong> já está a caminho da sua casa.
-        </p>
+        <p>Uhuul <strong>{costumerName}</strong>, sua <strong>{product.name}</strong> já está a caminho da sua casa.</p>
         <Link href="/">
           Voltar ao catálogo
         </Link>
@@ -50,7 +48,6 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   }
 
   const sessionId = String(query.session_id);
-
   const session = await stripe.checkout.sessions.retrieve(sessionId, {
     expand: ['line_items', 'line_items.data.price.product']
   });
